@@ -128,32 +128,35 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_NCLBUTTONDOWN:
 		if (wParam == HTCAPTION) {
-			if (GetAncestor(hWnd, GA_PARENT) == GetWindow(hWnd, GW_OWNER)) { // 子ウィンドウの場合は、親子関係を無くす
-				RECT rect;
-				GetWindowRect(hWnd, &rect);
-				MoveWindow(hWnd, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
-				SetParent(hWnd, NULL);
-				SetWindowLongPtr(hWnd, GWLP_USERDATA, CHILD_POSITION::NONE);
-			}
 			bCaptionDown = TRUE;
 		}
 		else {
 			bCaptionDown = FALSE;
 		}
 		return DefWindowProc(hWnd, msg, wParam, lParam);
+	case WM_APP:
+		if (GetAncestor(hWnd, GA_PARENT) == GetWindow(hWnd, GW_OWNER)) { // 子ウィンドウの場合は、親子関係を無くす
+			RECT rect;
+			GetWindowRect(hWnd, &rect);
+			MoveWindow(hWnd, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
+			SetParent(hWnd, NULL);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, CHILD_POSITION::NONE);
+		}
+		break;
 	case WM_ENTERSIZEMOVE:
 		if (bCaptionDown) {
 			bWindowMove = TRUE;
+			PostMessage(hWnd, WM_APP, 0, 0);
 		}
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	case WM_EXITSIZEMOVE:
 		if (IsWindowVisible(hLayer)) {
-			HWND hParent = GetWindow(hWnd, GW_OWNER);
-			SetParent(hWnd, hParent);
 			RECT rect;
 			GetWindowRect(hLayer, &rect);
+			HWND hParent = GetWindow(hWnd, GW_OWNER);
 			ScreenToClient(hParent, (LPPOINT)&rect.left);
 			ScreenToClient(hParent, (LPPOINT)&rect.right);
+			SetParent(hWnd, hParent);
 			MoveWindow(hWnd, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, GetWindowLongPtr(hLayer, GWLP_USERDATA));
 			ShowWindow(hLayer, SW_HIDE);
