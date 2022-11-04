@@ -140,6 +140,7 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			GetWindowRect(hWnd, &rect);
 			MoveWindow(hWnd, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
 			SetParent(hWnd, NULL);
+			ClipCursor(NULL);
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, CHILD_POSITION::NONE);
 		}
 		break;
