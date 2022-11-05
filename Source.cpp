@@ -136,9 +136,7 @@ LRESULT CALLBACK ChildWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	case WM_APP:
 		if (GetAncestor(hWnd, GA_PARENT) == GetWindow(hWnd, GW_OWNER)) { // 子ウィンドウの場合は、親子関係を無くす
-			RECT rect;
-			GetWindowRect(hWnd, &rect);
-			MoveWindow(hWnd, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
+			SetWindowPos(hWnd, 0, -9999, -9999, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING);
 			SetParent(hWnd, NULL);
 			ClipCursor(NULL);
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, CHILD_POSITION::NONE);
